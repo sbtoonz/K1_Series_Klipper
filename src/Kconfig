@@ -30,6 +30,8 @@ choice
 		bool "Giga Device GD32"
     config MACH_PRU
         bool "Beaglebone PRU"
+    config MACH_AR100
+        bool "Allwinner A64 AR100"
     config MACH_LINUX
         bool "Linux process"
     config MACH_SIMU
@@ -45,6 +47,7 @@ source "src/hc32f460/Kconfig"
 source "src/rp2040/Kconfig"
 source "src/gd32/Kconfig"
 source "src/pru/Kconfig"
+source "src/ar100/Kconfig"
 source "src/linux/Kconfig"
 source "src/simulator/Kconfig"
 
