@@ -213,11 +213,21 @@ class ResonanceTester:
                     else:
                         calibration_data[axis].add_data(new_data)
         return calibration_data
+    def _parse_chips(self, accel_chips):
+        parsed_chips = []
+        for chip_name in accel_chips.split(','):
+            if "adxl345" in chip_name:
+                chip_lookup_name = chip_name.strip()
+            else:
+                chip_lookup_name = "adxl345 " + chip_name.strip();
+            chip = self.printer.lookup_object(chip_lookup_name)
+            parsed_chips.append(chip)
+        return parsed_chips
     cmd_TEST_RESONANCES_help = ("Runs the resonance test for a specifed axis")
     def cmd_TEST_RESONANCES(self, gcmd):
         # Parse parameters
         axis = _parse_axis(gcmd, gcmd.get("AXIS").lower())
-        accel_chips = gcmd.get("CHIPS", None)
+        chips_str = gcmd.get("CHIPS", None)
         test_point = gcmd.get("POINT", None)
 
         if test_point:
@@ -230,15 +240,7 @@ class ResonanceTester:
                 raise gcmd.error("Invalid POINT parameter, must be 'x,y,z'"
                 " where x, y and z are valid floating point numbers")
 
-        if accel_chips:
-            parsed_chips = []
-            for chip_name in accel_chips.split(','):
-                if "adxl345" in chip_name:
-                    chip_lookup_name = chip_name.strip()
-                else:
-                    chip_lookup_name = "adxl345 " + chip_name.strip();
-                chip = self.printer.lookup_object(chip_lookup_name)
-                parsed_chips.append(chip)
+        accel_chips = self._parse_chips(chips_str) if chips_str else None
 
         outputs = gcmd.get("OUTPUT", "resonances").lower().split(',')
         for output in outputs:
@@ -261,8 +263,7 @@ class ResonanceTester:
         data = self._run_test(
                 gcmd, [axis], helper,
                 raw_name_suffix=name_suffix if raw_output else None,
-                accel_chips=parsed_chips if accel_chips else None,
-                test_point=test_point)[axis]
+                accel_chips=accel_chips, test_point=test_point)[axis]
         if csv_output:
             csv_name = self.save_calibration_data('resonances', name_suffix,
                                                   helper, axis, data,
@@ -283,6 +284,8 @@ class ResonanceTester:
             calibrate_axes = [TestAxis(axis.lower())]
             if axis.lower() == "y":
                 copy_TestAxis_y_to_x = True
+        chips_str = gcmd.get("CHIPS", None)
+        accel_chips = self._parse_chips(chips_str) if chips_str else None
 
         max_smoothing = gcmd.get_float(
                 "MAX_SMOOTHING", self.max_smoothing, minval=0.05)
@@ -294,7 +297,8 @@ class ResonanceTester:
         # Setup shaper calibration
         helper = shaper_calibrate.ShaperCalibrate(self.printer)
 
-        calibration_data = self._run_test(gcmd, calibrate_axes, helper)
+        calibration_data = self._run_test(gcmd, calibrate_axes, helper,
+                                          accel_chips=accel_chips)
 
         configfile = self.printer.lookup_object('configfile')
         for axis in calibrate_axes:
