@@ -8,6 +8,19 @@ All dates in this document are approximate.
 
 ## Changes
 
+20230619: The `relative_reference_index` option has been deprecated
+and superceded by the `zero_reference_position` option.  Refer to the
+[Bed Mesh Documentation](./Bed_Mesh.md#the-deprecated-relative_reference_index)
+for details on how to update the configuration.  With this deprecation
+the `RELATIVE_REFERENCE_INDEX` is no longer available as a parameter
+for the `BED_MESH_CALIBRATE` gcode command.
+
+20230530: The default canbus frequency in "make menuconfig" is
+now 1000000. If using canbus and using canbus with some other
+frequency is required, then be sure to select "Enable extra low-level
+configuration options" and specify the desired "CAN bus speed" in
+"make menuconfig" when compiling and flashing the micro-controller.
+
 20230525: `SHAPER_CALIBRATE` command immediately applies input shaper
 parameters if `[input_shaper]` was enabled already.
 
