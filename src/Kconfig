@@ -113,7 +113,7 @@ config WANT_SENSORS
 config WANT_LIS2DW
     bool
     depends on HAVE_GPIO_SPI
-    default y
+    default n
 config WANT_SOFTWARE_I2C
     bool
     depends on HAVE_GPIO && HAVE_GPIO_I2C
